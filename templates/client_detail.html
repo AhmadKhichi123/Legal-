@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="heading">
+    <h1>{{ client.name }}</h1>
+    <div>
+        <a class="btn secondary" href="{{ url_for('client_edit', client_id=client.id) }}">Edit</a>
+        <form class="inline" method="post" action="{{ url_for('client_delete', client_id=client.id) }}"
+              onsubmit="return confirm('Delete this client and ALL of their cases, hearings and documents?')">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <button class="btn danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <dl>
+        <dt>CNIC</dt><dd>{{ client.cnic or "—" }}</dd>
+        <dt>Phone</dt><dd>{{ client.phone or "—" }}</dd>
+        <dt>Email</dt><dd>{{ client.email or "—" }}</dd>
+        <dt>Address</dt><dd>{{ client.address or "—" }}</dd>
+        <dt>Client since</dt><dd>{{ client.created_on }}</dd>
+        <dt>Notes</dt><dd class="pre">{{ client.notes or "—" }}</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <div class="heading">
+        <h2>Cases</h2>
+        <a class="btn" href="{{ url_for('case_new', client_id=client.id) }}">+ New case</a>
+    </div>
+    {% if cases %}
+    <table>
+        <tr><th>Title</th><th>Case no.</th><th>Court</th><th>Status</th><th>Opened</th></tr>
+        {% for c in cases %}
+        <tr>
+            <td><a href="{{ url_for('case_detail', case_id=c.id) }}">{{ c.title }}</a></td>
+            <td>{{ c.case_number }}</td>
+            <td>{{ c.court }}</td>
+            <td><span class="badge {{ c.status|lower|replace(' ', '-') }}">{{ c.status }}</span></td>
+            <td>{{ c.opened_on }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">No cases for this client yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="report">
+<div class="heading">
+    <h1>Report</h1>
+    <button class="btn no-print" onclick="window.print()">Print / save as PDF</button>
+</div>
+
+<form class="filters no-print">
+    <label class="inline-label">Activity from <input type="date" name="from" value="{{ start }}"></label>
+    <label class="inline-label">to <input type="date" name="to" value="{{ end }}"></label>
+    <button class="btn secondary">Update report</button>
+</form>
+
+<p class="muted">Generated {{ generated }} for {{ session.username }}. Activity period: {{ start }} to {{ end }}.</p>
+
+<div class="card">
+    <h2>Case summary</h2>
+    <table>
+        <tr>{% for s in by_status %}<th>{{ s }}</th>{% endfor %}<th>Total</th></tr>
+        <tr>{% for s, n in by_status.items() %}<td>{{ n }}</td>{% endfor %}<td><strong>{{ by_status.values()|sum }}</strong></td></tr>
+    </table>
+    {% if by_type %}
+    <p class="small">By category:
+        {% for t in by_type %}{{ t.case_type or "Unspecified" }} {{ t.n }}{% if not loop.last %} · {% endif %}{% endfor %}
+    </p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Case activity in this period</h2>
+    <h3>Cases opened ({{ opened|length }})</h3>
+    {% if opened %}
+    <table>
+        <tr><th>Opened</th><th>Case</th><th>Case no.</th><th>Client</th><th>Status</th></tr>
+        {% for c in opened %}
+        <tr><td>{{ c.opened_on }}</td><td>{{ c.title }}</td><td>{{ c.case_number }}</td><td>{{ c.client_name }}</td><td>{{ c.status }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p class="muted">None.</p>{% endif %}
+
+    <h3>Hearings held ({{ held|length }})</h3>
+    {% if held %}
+    <table>
+        <tr><th>Date</th><th>Case</th><th>Client</th><th>Purpose</th><th>Outcome</th></tr>
+        {% for h in held %}
+        <tr><td>{{ h.hearing_date }}</td><td>{{ h.case_title }}</td><td>{{ h.client_name }}</td><td>{{ h.purpose }}</td><td>{{ h.outcome }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p class="muted">None.</p>{% endif %}
+</div>
+
+<div class="card">
+    <h2>Upcoming schedule (next 30 days)</h2>
+    {% if schedule %}
+    <table>
+        <tr><th>Date</th><th>Case</th><th>Case no.</th><th>Client</th><th>Court</th><th>Purpose</th></tr>
+        {% for h in schedule %}
+        <tr><td>{{ h.hearing_date }}</td><td>{{ h.case_title }}</td><td>{{ h.case_number }}</td><td>{{ h.client_name }}</td><td>{{ h.court }}</td><td>{{ h.purpose }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p class="muted">No hearings in the next 30 days.</p>{% endif %}
+</div>
+
+<div class="card">
+    <h2>Clients ({{ clients|length }})</h2>
+    {% if clients %}
+    <table>
+        <tr><th>Name</th><th>CNIC</th><th>Phone</th><th>Active cases</th><th>All cases</th></tr>
+        {% for c in clients %}
+        <tr><td>{{ c.name }}</td><td>{{ c.cnic or "" }}</td><td>{{ c.phone }}</td><td>{{ c.active or 0 }}</td><td>{{ c.total }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p class="muted">No clients yet.</p>{% endif %}
+</div>
+</div>
+{% endblock %}

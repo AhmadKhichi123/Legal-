@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+    <h1>{{ "Create an account" if registering else "Sign in" }}</h1>
+    {% if registering %}<p class="muted">Your clients, cases and documents are private to your account.</p>{% endif %}
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <label>Username <input name="username" required autofocus></label>
+        <label>Password <input type="password" name="password" required {% if registering %}minlength="8"{% endif %}></label>
+        {% if registering %}
+        <label>Confirm password <input type="password" name="confirm" required minlength="8"></label>
+        {% endif %}
+        <button class="btn">{{ "Create account" if registering else "Sign in" }}</button>
+    </form>
+    <p class="muted small">
+        {% if registering %}Already registered? <a href="{{ url_for('login') }}">Sign in</a>
+        {% else %}New here? <a href="{{ url_for('register') }}">Create an account</a>{% endif %}
+    </p>
+</div>
+{% endblock %}

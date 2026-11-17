@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Legal Client Management{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Lets the site be installed as an app on phones and computers -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#1f2d44">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Legal CMS">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="{{ url_for('static', filename='icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon-192.png') }}">
+</head>
+<body>
+{% if session.user_id %}
+<header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard') }}">Legal Client Management</a>
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('clients') }}">Clients</a>
+        <a href="{{ url_for('cases') }}">Cases</a>
+        <a href="{{ url_for('reports') }}">Reports</a>
+        <a href="{{ url_for('change_password') }}">Password</a>
+    </nav>
+    <form class="search" action="{{ url_for('search') }}">
+        <input type="search" name="q" placeholder="Search everything…" value="{{ q or '' }}">
+    </form>
+    <form method="post" action="{{ url_for('logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <button class="link">Sign out ({{ session.username }})</button>
+    </form>
+</header>
+{% endif %}
+
+<main>
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <p class="flash {{ category }}">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</main>
+<button id="install-button" class="btn install" hidden>Install app</button>
+<script src="{{ url_for('static', filename='install.js') }}"></script>
+</body>
+</html>

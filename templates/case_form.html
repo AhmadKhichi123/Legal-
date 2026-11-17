@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+    <h1>{{ "Edit case" if editing else "New case" }}</h1>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <label>Client *
+            <select name="client_id" required>
+                {% for cl in clients %}
+                <option value="{{ cl.id }}" {% if cl.id|string == case.client_id|string %}selected{% endif %}>{{ cl.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Case title * <input name="title" value="{{ case.title or '' }}" required placeholder="e.g. Khan v. Ahmed"></label>
+        <label>Case number <input name="case_number" value="{{ case.case_number or '' }}"></label>
+        <label>Court <input name="court" value="{{ case.court or '' }}"></label>
+        <label>Type
+            <select name="case_type">
+                {% for t in types %}
+                <option {% if t == case.case_type %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Status
+            <select name="status">
+                {% for s in statuses %}
+                <option {% if s == case.status %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Opened on <input type="date" name="opened_on" value="{{ case.opened_on or today }}"></label>
+        <label>Description <textarea name="description" rows="4">{{ case.description or '' }}</textarea></label>
+        <button class="btn">Save</button>
+        <a class="btn secondary" href="{{ url_for('case_detail', case_id=case.id) if editing else url_for('cases') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

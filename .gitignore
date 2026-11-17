@@ -1,0 +1,22 @@
+# Records, uploaded documents, passwords and keys: never upload these
+data/
+*.db
+*.pem
+secret.key
+
+# Built files (can be recreated with tools/make_single_file.py)
+dist/
+build/
+*.spec
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

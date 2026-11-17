@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="heading">
+    <h1>{{ case.title }} <span class="badge {{ case.status|lower|replace(' ', '-') }}">{{ case.status }}</span></h1>
+    <div>
+        <a class="btn secondary" href="{{ url_for('case_edit', case_id=case.id) }}">Edit</a>
+        <form class="inline" method="post" action="{{ url_for('case_delete', case_id=case.id) }}"
+              onsubmit="return confirm('Delete this case with all its hearings and documents?')">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <button class="btn danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <dl>
+        <dt>Client</dt><dd><a href="{{ url_for('client_detail', client_id=client.id) }}">{{ client.name }}</a></dd>
+        <dt>Case number</dt><dd>{{ case.case_number or "—" }}</dd>
+        <dt>Court</dt><dd>{{ case.court or "—" }}</dd>
+        <dt>Type</dt><dd>{{ case.case_type or "—" }}</dd>
+        <dt>Opened on</dt><dd>{{ case.opened_on }}</dd>
+        <dt>Description</dt><dd class="pre">{{ case.description or "—" }}</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <h2>Hearings</h2>
+    {% if hearings %}
+    <table>
+        <tr><th>Date</th><th>Purpose</th><th>Outcome / notes</th><th></th></tr>
+        {% for h in hearings %}
+        <tr>
+            <td>{{ h.hearing_date }}{% if h.hearing_date >= today %} <span class="badge ongoing">Upcoming</span>{% endif %}</td>
+            <td>{{ h.purpose }}</td>
+            <td>{{ h.outcome }}</td>
+            <td class="right">
+                <form class="inline" method="post" action="{{ url_for('hearing_delete', hearing_id=h.id) }}"
+                      onsubmit="return confirm('Remove this hearing?')">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <button class="link danger-text">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">No hearings recorded.</p>
+    {% endif %}
+
+    <form class="row" method="post" action="{{ url_for('hearing_add', case_id=case.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input type="date" name="hearing_date" required>
+        <input name="purpose" placeholder="Purpose (e.g. Evidence)">
+        <input name="outcome" placeholder="Outcome / notes">
+        <button class="btn">Add hearing</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Documents</h2>
+    {% if documents %}
+    <table>
+        <tr><th>Title</th><th>File</th><th>Uploaded</th><th></th></tr>
+        {% for d in documents %}
+        <tr>
+            <td>{{ d.title }}</td>
+            <td><a href="{{ url_for('document_download', doc_id=d.id) }}">{{ d.filename }}</a></td>
+            <td>{{ d.uploaded_on }}</td>
+            <td class="right">
+                <form class="inline" method="post" action="{{ url_for('document_delete', doc_id=d.id) }}"
+                      onsubmit="return confirm('Delete this document?')">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <button class="link danger-text">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">No documents uploaded.</p>
+    {% endif %}
+
+    <form class="row" method="post" enctype="multipart/form-data"
+          action="{{ url_for('document_upload', case_id=case.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input name="title" placeholder="Document title (e.g. Affidavit)">
+        <input type="file" name="file" required>
+        <button class="btn">Upload</button>
+    </form>
+    <p class="muted small">Allowed file types: {{ extensions }}. Maximum 20 MB.</p>
+</div>
+{% endblock %}

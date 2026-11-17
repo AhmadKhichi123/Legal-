@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Search results for “{{ q }}”</h1>
+
+<div class="card">
+    <h2>Clients ({{ results.clients|length }})</h2>
+    <ul class="results">
+        {% for c in results.clients %}
+        <li><a href="{{ url_for('client_detail', client_id=c.id) }}">{{ c.name }}</a>
+            <span class="muted">{{ c.phone }} {{ c.email }}</span></li>
+        {% else %}<li class="muted">No matching clients.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Cases ({{ results.cases|length }})</h2>
+    <ul class="results">
+        {% for c in results.cases %}
+        <li><a href="{{ url_for('case_detail', case_id=c.id) }}">{{ c.title }}</a>
+            <span class="muted">{{ c.case_number }} · {{ c.client_name }} · {{ c.status }}</span></li>
+        {% else %}<li class="muted">No matching cases.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Documents ({{ results.documents|length }})</h2>
+    <ul class="results">
+        {% for d in results.documents %}
+        <li><a href="{{ url_for('document_download', doc_id=d.id) }}">{{ d.title }}</a>
+            <span class="muted">{{ d.filename }} · in
+            <a href="{{ url_for('case_detail', case_id=d.case_id) }}">{{ d.case_title }}</a></span></li>
+        {% else %}<li class="muted">No matching documents.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

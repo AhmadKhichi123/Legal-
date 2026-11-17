@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="heading">
+    <h1>Cases</h1>
+    <div>
+        <a class="btn secondary" href="{{ url_for('cases', status='history') }}">Case history</a>
+        <a class="btn" href="{{ url_for('case_new') }}">+ New case</a>
+    </div>
+</div>
+
+<form class="filters">
+    <input type="search" name="q" value="{{ q }}" placeholder="Title, case number or client name">
+    <select name="status" aria-label="Status">
+        <option value="">All statuses</option>
+        <option value="active" {% if status == 'active' %}selected{% endif %}>Active (Ongoing + Pending)</option>
+        <option value="history" {% if status == 'history' %}selected{% endif %}>History (Completed + Closed)</option>
+        {% for s in statuses %}
+        <option {% if s == status %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+    <select name="type" aria-label="Category">
+        <option value="">All categories</option>
+        {% for t in types %}
+        <option {% if t == case_type %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+    </select>
+    <label class="inline-label">Hearing from <input type="date" name="from" value="{{ hearing_from }}"></label>
+    <label class="inline-label">to <input type="date" name="to" value="{{ hearing_to }}"></label>
+    <button class="btn secondary">Filter</button>
+    <a class="btn secondary" href="{{ url_for('cases') }}">Clear</a>
+</form>
+
+<div class="card">
+    {% if cases %}
+    <table>
+        <tr><th>Title</th><th>Case no.</th><th>Client</th><th>Type</th><th>Status</th><th>Next hearing</th></tr>
+        {% for c in cases %}
+        <tr>
+            <td><a href="{{ url_for('case_detail', case_id=c.id) }}">{{ c.title }}</a></td>
+            <td>{{ c.case_number }}</td>
+            <td><a href="{{ url_for('client_detail', client_id=c.client_id) }}">{{ c.client_name }}</a></td>
+            <td>{{ c.case_type }}</td>
+            <td><span class="badge {{ c.status|lower|replace(' ', '-') }}">{{ c.status }}</span></td>
+            <td>{{ c.next_hearing or "—" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">No cases found.</p>
+    {% endif %}
+</div>
+{% endblock %}

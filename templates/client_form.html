@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+    <h1>{{ "Edit client" if editing else "New client" }}</h1>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <label>Full name * <input name="name" value="{{ client.name or '' }}" required></label>
+        <label>CNIC <input name="cnic" value="{{ client.cnic or '' }}" placeholder="12345-1234567-1" pattern="\d{5}-\d{7}-\d" title="Format: 12345-1234567-1"></label>
+        <label>Phone <input name="phone" value="{{ client.phone or '' }}"></label>
+        <label>Email <input type="email" name="email" value="{{ client.email or '' }}"></label>
+        <label>Address <input name="address" value="{{ client.address or '' }}"></label>
+        <label>Notes <textarea name="notes" rows="4">{{ client.notes or '' }}</textarea></label>
+        <button class="btn">Save</button>
+        <a class="btn secondary" href="{{ url_for('client_detail', client_id=client.id) if editing else url_for('clients') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}
